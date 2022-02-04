@@ -13,7 +13,6 @@ public class ResponseComposer {
         bufferedWriter.newLine();
         bufferedWriter.newLine();
         bufferedWriter.write(response);
-        bufferedWriter.flush();
     }
 
 

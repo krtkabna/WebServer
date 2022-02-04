@@ -17,9 +17,12 @@ public final class FileService {
 
     public static String readFile(String path) throws IOException {
         File file = new File(path);
-        try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
-            return isReadable(file) ?
-                fileReader.lines().collect(Collectors.joining()) : NOT_FOUND + path;
+        if (isReadable(file)) {
+            try (BufferedReader fileReader = new BufferedReader(new FileReader(file))) {
+                return fileReader.lines().collect(Collectors.joining());
+            }
+        } else {
+            return NOT_FOUND + path;
         }
     }
 
