@@ -1,3 +1,3 @@
-# Web com.wasp.webServer.Server
+# Web Server
 
-Web server for static resources
+A web server implementation with static resources. Web browser acts as client.
