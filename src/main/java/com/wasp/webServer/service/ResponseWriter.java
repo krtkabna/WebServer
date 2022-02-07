@@ -2,6 +2,7 @@ package com.wasp.webServer.service;
 
 import com.wasp.webServer.model.HttpStatus;
 import com.wasp.webServer.model.Response;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class ResponseWriter {
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
+    private char[] buffer = new char[1024];
 
     public void writeResponse(BufferedWriter bufferedWriter, Response response) throws IOException {
         HttpStatus httpStatus = response.getHttpStatus();
@@ -22,9 +24,7 @@ public class ResponseWriter {
             bufferedWriter.write(CRLF);
         }
         bufferedWriter.write(CRLF);
-        //FIXME write files in portions in a loop
-        String content = response.getContent().lines().collect(Collectors.joining());
-        bufferedWriter.write(content);
+        writeContent(bufferedWriter, response);
         bufferedWriter.flush();
     }
 
@@ -39,7 +39,7 @@ public class ResponseWriter {
         }
     }
 
-    private static void writeHeaders(BufferedWriter bufferedWriter, Map<String, String[]> headers) throws IOException {
+    private void writeHeaders(BufferedWriter bufferedWriter, Map<String, String[]> headers) throws IOException {
         Iterator<Map.Entry<String, String[]>> iterator = headers.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String[]> entry = iterator.next();
@@ -47,5 +47,14 @@ public class ResponseWriter {
                 Arrays.stream(entry.getValue()).collect(Collectors.joining(", ")));
             bufferedWriter.newLine();
         }
+    }
+
+    private void writeContent(BufferedWriter bufferedWriter, Response response) throws IOException {
+        BufferedReader responseReader = response.getContent();
+        while (responseReader.read(buffer) != -1) {
+            bufferedWriter.write(buffer);
+            bufferedWriter.write(CRLF);
+        }
+        responseReader.close();
     }
 }
