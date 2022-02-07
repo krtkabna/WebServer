@@ -3,7 +3,6 @@ package com.wasp.webServer.service;
 import com.wasp.webServer.exception.WebServerException;
 import com.wasp.webServer.model.HttpStatus;
 import com.wasp.webServer.model.Response;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,16 +34,6 @@ public class ResponseWriter {
         } catch (IOException e) {
             throw new WebServerException(e.getMessage(), e);
         }
-    }
-
-    //todo remove later
-    public static void writeResponse(BufferedWriter bufferedWriter, Response response, HttpStatus httpStatus) throws IOException {
-        System.out.println("Writing response");
-        bufferedWriter.write(httpStatus.getCode() + " " + httpStatus.getMessage());
-        bufferedWriter.newLine();
-        bufferedWriter.newLine();
-        BufferedReader bufferedReader = response.getContent();
-        bufferedWriter.write(bufferedReader.lines().collect(Collectors.joining()));
     }
 
     private static void writeHeaders(BufferedWriter bufferedWriter, Map<String, String[]> headers) throws IOException {

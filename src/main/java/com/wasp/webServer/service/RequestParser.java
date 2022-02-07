@@ -9,11 +9,6 @@ import java.util.Map;
 import static com.wasp.webServer.model.HttpMethod.getHttpMethodByName;
 
 public final class RequestParser {
-    private static final String GET = "GET ";
-
-    public static boolean isHeader(String request) {
-        return request.startsWith(GET);
-    }
 
     public Request parseRequest(BufferedReader reader) throws IOException {
         Request request = new Request();
