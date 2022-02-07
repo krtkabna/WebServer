@@ -1,6 +1,5 @@
 package com.wasp.webServer.service;
 
-import com.wasp.webServer.exception.WebServerException;
 import com.wasp.webServer.model.HttpStatus;
 import com.wasp.webServer.model.Request;
 import com.wasp.webServer.model.Response;
@@ -10,9 +9,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class RequestHandler {
-    private BufferedReader reader;
-    private BufferedWriter writer;
-    private ContentReader contentReader;
+    private static final RequestParser REQUEST_PARSER = new RequestParser();
+    private static final ResponseWriter RESPONSE_WRITER = new ResponseWriter();
+    private final BufferedReader reader;
+    private final BufferedWriter writer;
+    private final ContentReader contentReader;
 
     public RequestHandler(BufferedReader reader, BufferedWriter writer, ContentReader contentReader) {
         this.reader = reader;
@@ -21,21 +22,22 @@ public class RequestHandler {
     }
 
     public void handle() {
-        RequestParser requestParser = new RequestParser();
-        ResponseWriter responseWriter = new ResponseWriter();
         try {
-            Request request = requestParser.parseRequest(reader);
+            Request request = REQUEST_PARSER.parseRequest(reader);
 
             Response response = new Response();
             response.setContent(contentReader.readContent(request.getUri()));
             response.setHttpStatus(HttpStatus.OK);
 
-            responseWriter.writeResponse(writer, response);
+            RESPONSE_WRITER.writeResponse(writer, response);
         } catch (FileNotFoundException e) {
-            responseWriter.writeResponse(writer, HttpStatus.BAD_REQUEST);
+            RESPONSE_WRITER.writeResponse(writer, HttpStatus.NOT_FOUND);
         } catch (IOException e) {
-            System.out.println(e.getCause());
-            throw new WebServerException(e.getMessage(), e);
+            //throwing exception is a bad practice, will stop server. lod error instead
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            RESPONSE_WRITER.writeResponse(writer, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

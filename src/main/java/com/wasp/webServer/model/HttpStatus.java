@@ -6,7 +6,6 @@ public enum HttpStatus {
     NOT_FOUND(404, "Not Found"),
     INTERNAL_SERVER_ERROR(500, "Internal Server Error");
 
-    private static final String HTTP_VERSION = "HTTP/1.1";
     private final int code;
     private final String message;
 
@@ -25,6 +24,6 @@ public enum HttpStatus {
 
     @Override
     public String toString() {
-        return HTTP_VERSION + " " + code + " " + message;
+        return code + " " + message;
     }
 }

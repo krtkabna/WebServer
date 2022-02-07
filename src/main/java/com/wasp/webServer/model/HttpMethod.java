@@ -2,7 +2,6 @@ package com.wasp.webServer.model;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public enum HttpMethod {
     GET("GET"), POST("POST");
@@ -21,6 +20,6 @@ public enum HttpMethod {
         return Arrays.stream(values())
             .filter(httpMethod -> httpMethod.name.equals(name))
             .findFirst()
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException("No HTTP method found by name: " + name));
     }
 }
