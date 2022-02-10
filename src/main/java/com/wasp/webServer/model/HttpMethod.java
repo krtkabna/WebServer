@@ -4,21 +4,11 @@ import com.wasp.webServer.exception.MethodNotAllowedException;
 import java.util.Arrays;
 
 public enum HttpMethod {
-    GET("GET"), POST("POST");
-
-    private String name;
-
-    HttpMethod(String name) {
-        this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
+    GET, POST;
 
     public static HttpMethod getHttpMethodByName(String name) throws MethodNotAllowedException {
         return Arrays.stream(values())
-            .filter(httpMethod -> httpMethod.name.equals(name))
+            .filter(httpMethod -> name.equals(httpMethod.name()))
             .findFirst()
             .orElseThrow(MethodNotAllowedException::new);
     }
