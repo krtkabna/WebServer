@@ -1,5 +1,8 @@
 package com.wasp.webServer.service;
 
+import com.wasp.webServer.exception.BadRequestException;
+import com.wasp.webServer.exception.MethodNotAllowedException;
+import com.wasp.webServer.exception.InternalServerErrorException;
 import com.wasp.webServer.model.HttpStatus;
 import com.wasp.webServer.model.Request;
 import com.wasp.webServer.model.Response;
@@ -7,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class RequestHandler {
     private static final RequestParser REQUEST_PARSER = new RequestParser();
@@ -30,13 +34,13 @@ public class RequestHandler {
             response.setHttpStatus(HttpStatus.OK);
 
             RESPONSE_WRITER.writeResponse(writer, response);
+        } catch (BadRequestException e) {
+            RESPONSE_WRITER.writeResponse(writer, HttpStatus.BAD_REQUEST);
         } catch (FileNotFoundException e) {
             RESPONSE_WRITER.writeResponse(writer, HttpStatus.NOT_FOUND);
-        } catch (IOException e) {
-            //throwing exception is a bad practice, will stop server. lod error instead
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (MethodNotAllowedException e) {
+            RESPONSE_WRITER.writeResponse(writer, HttpStatus.METHOD_NOT_ALLOWED);
+        } catch (InternalServerErrorException e) {
             RESPONSE_WRITER.writeResponse(writer, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

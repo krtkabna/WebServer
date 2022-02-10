@@ -1,7 +1,7 @@
 package com.wasp.webServer.model;
 
+import com.wasp.webServer.exception.MethodNotAllowedException;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 public enum HttpMethod {
     GET("GET"), POST("POST");
@@ -16,10 +16,10 @@ public enum HttpMethod {
         return name;
     }
 
-    public static HttpMethod getHttpMethodByName(String name) {
+    public static HttpMethod getHttpMethodByName(String name) throws MethodNotAllowedException {
         return Arrays.stream(values())
             .filter(httpMethod -> httpMethod.name.equals(name))
             .findFirst()
-            .orElseThrow(() -> new NoSuchElementException("No HTTP method found by name: " + name));
+            .orElseThrow(MethodNotAllowedException::new);
     }
 }

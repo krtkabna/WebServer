@@ -1,5 +1,8 @@
 package com.wasp.webServer.service;
 
+import com.wasp.webServer.exception.BadRequestException;
+import com.wasp.webServer.exception.MethodNotAllowedException;
+import com.wasp.webServer.exception.InternalServerErrorException;
 import com.wasp.webServer.model.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,14 +13,22 @@ import static com.wasp.webServer.model.HttpMethod.getHttpMethodByName;
 
 public final class RequestParser {
 
-    public Request parseRequest(BufferedReader reader) throws IOException {
+    public Request parseRequest(BufferedReader reader) throws MethodNotAllowedException,
+                                                              InternalServerErrorException,
+                                                              BadRequestException {
         Request request = new Request();
-        injectUriAndHttpMethod(reader, request);
-        injectHeaders(reader, request);
+        try {
+            injectUriAndHttpMethod(reader, request);
+            injectHeaders(reader, request);
+        } catch (IOException e) {
+            throw new InternalServerErrorException();
+        } catch (NullPointerException e) {
+            throw new BadRequestException();
+        }
         return request;
     }
 
-    private void injectUriAndHttpMethod(BufferedReader reader, Request request) throws IOException {
+    private void injectUriAndHttpMethod(BufferedReader reader, Request request) throws IOException, MethodNotAllowedException {
         String[] split = reader.readLine().split("\\s");
         request.setHttpMethod(getHttpMethodByName(split[0]));
         request.setUri(split[1]);
