@@ -1,8 +1,8 @@
 package com.wasp.webServer.service;
 
 import com.wasp.webServer.exception.BadRequestException;
-import com.wasp.webServer.exception.MethodNotAllowedException;
 import com.wasp.webServer.exception.InternalServerErrorException;
+import com.wasp.webServer.exception.MethodNotAllowedException;
 import com.wasp.webServer.model.Request;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,7 +22,7 @@ public final class RequestParser {
             injectHeaders(reader, request);
         } catch (IOException e) {
             throw new InternalServerErrorException();
-        } catch (NullPointerException e) {
+        } catch (IndexOutOfBoundsException e) {
             throw new BadRequestException();
         }
         return request;
