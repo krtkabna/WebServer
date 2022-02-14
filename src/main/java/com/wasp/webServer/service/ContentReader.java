@@ -16,7 +16,7 @@ public class ContentReader {
         try {
             return new BufferedReader(new FileReader(webAppPath + uri));
         } catch (FileNotFoundException e) {
-            throw new NotFoundException();
+            throw new NotFoundException("File not found by uri: " + webAppPath + uri, e);
         }
     }
 }

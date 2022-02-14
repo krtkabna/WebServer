@@ -8,18 +8,16 @@ import com.wasp.webServer.model.HttpStatus;
 import com.wasp.webServer.model.Request;
 import com.wasp.webServer.model.Response;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 
 public class RequestHandler {
     private static final RequestParser REQUEST_PARSER = new RequestParser();
-    private static final ResponseWriter RESPONSE_WRITER = new ResponseWriter();
+    private final ResponseWriter responseWriter;
     private final BufferedReader reader;
-    private final BufferedWriter writer;
     private final ContentReader contentReader;
 
-    public RequestHandler(BufferedReader reader, BufferedWriter writer, ContentReader contentReader) {
+    public RequestHandler(BufferedReader reader, ResponseWriter writer, ContentReader contentReader) {
         this.reader = reader;
-        this.writer = writer;
+        this.responseWriter = writer;
         this.contentReader = contentReader;
     }
 
@@ -31,15 +29,19 @@ public class RequestHandler {
             response.setContent(contentReader.readContent(request.getUri()));
             response.setHttpStatus(HttpStatus.OK);
 
-            RESPONSE_WRITER.writeResponse(writer, response);
+            responseWriter.writeResponse(response);
         } catch (BadRequestException e) {
-            RESPONSE_WRITER.writeResponse(writer, HttpStatus.BAD_REQUEST);
+            System.out.println(e.getMessage());
+            responseWriter.writeResponse(HttpStatus.BAD_REQUEST);
         } catch (NotFoundException e) {
-            RESPONSE_WRITER.writeResponse(writer, HttpStatus.NOT_FOUND);
+            System.out.println(e.getMessage());
+            responseWriter.writeResponse(HttpStatus.NOT_FOUND);
         } catch (MethodNotAllowedException e) {
-            RESPONSE_WRITER.writeResponse(writer, HttpStatus.METHOD_NOT_ALLOWED);
+            System.out.println(e.getMessage());
+            responseWriter.writeResponse(HttpStatus.METHOD_NOT_ALLOWED);
         } catch (InternalServerErrorException e) {
-            RESPONSE_WRITER.writeResponse(writer, HttpStatus.INTERNAL_SERVER_ERROR);
+            System.out.println(e.getMessage());
+            responseWriter.writeResponse(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

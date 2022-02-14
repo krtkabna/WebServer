@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 
-public class ResponseWriter {
+public class ResponseWriter implements AutoCloseable {
     private static final String RESPONSE_FORMAT = "HTTP/1.1 %s\r\n";
     private static final String HTML_FORMAT =
         "<!DOCTYPE html>" +
@@ -19,22 +19,27 @@ public class ResponseWriter {
             "</html>";
     private static final String CRLF = "\r\n";
     private char[] buffer = new char[1024];
+    private BufferedWriter bufferedWriter;
 
-    public void writeResponse(BufferedWriter bufferedWriter, Response response) throws InternalServerErrorException {
+    public ResponseWriter(BufferedWriter bufferedWriter) {
+        this.bufferedWriter = bufferedWriter;
+    }
+
+    public void writeResponse(Response response) throws InternalServerErrorException {
         try {
             HttpStatus httpStatus = response.getHttpStatus();
             bufferedWriter.write(String.format(RESPONSE_FORMAT, httpStatus));
             if (response.getHeaders() != null) {
-                writeHeaders(bufferedWriter, response.getHeaders());
+                writeHeaders(response.getHeaders());
             }
             bufferedWriter.write(CRLF);
-            writeContent(bufferedWriter, response);
+            writeContent(response);
         } catch (IOException e) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException("An I/O exception occurred", e);
         }
     }
 
-    public void writeResponse(BufferedWriter bufferedWriter, HttpStatus httpStatus) {
+    public void writeResponse(HttpStatus httpStatus) {
         try {
             bufferedWriter.write(String.format(RESPONSE_FORMAT, httpStatus));
             bufferedWriter.write(CRLF);
@@ -45,18 +50,23 @@ public class ResponseWriter {
         }
     }
 
-    private void writeHeaders(BufferedWriter bufferedWriter, Map<String, String[]> headers) throws IOException {
+    private void writeHeaders(Map<String, String[]> headers) throws IOException {
         for (Map.Entry<String, String[]> header : headers.entrySet()) {
             bufferedWriter.write(String.format("%s: %s%n", header.getKey(), Arrays.toString(header.getValue())));
         }
     }
 
-    private void writeContent(BufferedWriter bufferedWriter, Response response) throws IOException {
+    private void writeContent(Response response) throws IOException {
         BufferedReader responseReader = response.getContent();
         while (responseReader.read(buffer) != -1) {
             bufferedWriter.write(buffer);
             bufferedWriter.write(CRLF);
         }
         responseReader.close();
+    }
+
+    @Override
+    public void close() throws Exception {
+        bufferedWriter.close();
     }
 }

@@ -10,6 +10,6 @@ public enum HttpMethod {
         return Arrays.stream(values())
             .filter(httpMethod -> name.equals(httpMethod.name()))
             .findFirst()
-            .orElseThrow(MethodNotAllowedException::new);
+            .orElseThrow(() -> new MethodNotAllowedException("Method not supported: " + name));
     }
 }

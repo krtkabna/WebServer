@@ -16,16 +16,17 @@ public final class RequestParser {
     public Request parseRequest(BufferedReader reader) throws MethodNotAllowedException,
                                                               InternalServerErrorException,
                                                               BadRequestException {
-        Request request = new Request();
         try {
+            Request request = new Request();
             injectUriAndHttpMethod(reader, request);
             injectHeaders(reader, request);
+            return request;
         } catch (IOException e) {
-            throw new InternalServerErrorException();
-        } catch (IndexOutOfBoundsException e) {
-            throw new BadRequestException();
+            //todo fix Internal Server Error handling
+            throw new InternalServerErrorException("An I/O exception occurred", e);
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            throw new BadRequestException("Could not parse request", e);
         }
-        return request;
     }
 
     private void injectUriAndHttpMethod(BufferedReader reader, Request request) throws IOException, MethodNotAllowedException {
